@@ -1,4 +1,4 @@
-name: Build C++ to WebAssembly
+name: Build C++ to WASM
 
 on:
   push:
@@ -7,27 +7,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: emscripten/emsdk:latest  # pakai container resmi Emscripten
 
     steps:
-      # Ambil repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Install Emscripten
-      - name: Install Emscripten
-        run: |
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
-          ./emsdk install latest
-          ./emsdk activate latest
-          source ./emsdk_env.sh
-
-      # Compile C++ ke WASM
       - name: Compile C++ to WASM
         run: |
           emcc main.cpp -o main.js -s WASM=1 -s EXPORTED_FUNCTIONS='["_tambah"]' -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap"]'
 
-      # Upload artifact
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
